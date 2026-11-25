@@ -9,7 +9,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use hori_core::Engine;
+use hori_core::{Engine, install_crypto_provider};
 
 fn usage() -> ! {
     eprintln!(
@@ -33,6 +33,7 @@ fn fmt_bytes(b: u64) -> String {
 }
 
 fn main() {
+    install_crypto_provider();
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::try_from_default_env()

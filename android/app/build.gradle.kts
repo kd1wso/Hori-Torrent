@@ -30,7 +30,7 @@ val rustlsPlatformVerifierVersion = providers.of(RustlsVersion::class) {
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
-        if (requested.group == "rustls" && requested.name == "rustls-platform-verifier") {
+        if (requested.group == "org.rustls" && requested.name == "rustls-platform-verifier") {
             useVersion(rustlsPlatformVerifierVersion.get())
             because("Kotlin component version must match the Rust crate")
         }
@@ -112,5 +112,5 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     // Version resolved dynamically from Cargo.lock above.
-    implementation("rustls:rustls-platform-verifier")
+    implementation("org.rustls:rustls-platform-verifier")
 }

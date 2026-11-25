@@ -8,3 +8,10 @@ pub mod engine;
 mod jni_bridge;
 
 pub use engine::Engine;
+
+/// Install the ring crypto provider as the process-wide rustls default.
+/// Must run before any TLS client is built (both the Android JNI init and
+/// the desktop CLI call this at startup).
+pub fn install_crypto_provider() {
+    let _ = rustls::crypto::ring::default_provider().install_default();
+}
