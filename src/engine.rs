@@ -58,8 +58,10 @@ impl Engine {
             .build()
             .context("cannot start tokio runtime")?;
         let session = rt.block_on(async {
-            let mut opts = SessionOptions::default();
-            opts.fastresume = true;
+            let mut opts = SessionOptions {
+                fastresume: true,
+                ..Default::default()
+            };
             if let Some(folder) = session_folder {
                 std::fs::create_dir_all(&folder)?;
                 opts.persistence = Some(SessionPersistenceConfig::Json {
