@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- stylized magnet/horseshoe mark -->
+    <path
+        android:pathData="M44,30 A22,22 0 1,0 44,74 L44,60 A8,8 0 1,1 44,44 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M44,44 L56,44 L56,60 L44,60 Z"
+        android:fillColor="#7EC8E3" />
+    <path
+        android:pathData="M64,38 L78,38 M64,48 L74,48 M64,58 L70,58"
+        android:strokeColor="#7EC8E3"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+</vector>
