@@ -65,7 +65,17 @@ impl Engine {
             if let Some(folder) = session_folder {
                 std::fs::create_dir_all(&folder)?;
                 opts.persistence = Some(SessionPersistenceConfig::Json {
-                    folder: Some(folder),
+                    folder: Some(folder.clone()),
+                });
+                // On Android there is no HOME/project directory, so librqbit's
+                // default DHT persistence location cannot be resolved. Point it
+                // at an explicit file inside our state folder.
+                opts.dht = Some(librqbit::DhtSessionConfig {
+                    persistence: Some(librqbit::dht::DhtPersistenceConfig {
+                        config_filename: Some(folder.join("dht.json")),
+                        ..Default::default()
+                    }),
+                    ..Default::default()
                 });
             }
             Session::new_with_opts(output_folder.clone(), opts).await
