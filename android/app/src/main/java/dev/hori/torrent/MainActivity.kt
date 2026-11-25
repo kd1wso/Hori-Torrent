@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScreen(vm: TorrentViewModel) {
     var showAdd by remember { mutableStateOf(false) }
