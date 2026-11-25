@@ -4,6 +4,39 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// Resolve the rustls-platform-verifier Android component version from the
+// Cargo lockfile so the Kotlin and Rust halves can never drift apart.
+abstract class RustlsVersion : ValueSource<String, RustlsVersion.Params> {
+    interface Params : ValueSourceParameters {
+        val lockFile: RegularFileProperty
+    }
+
+    override fun obtain(): String {
+        val crate = "rustls-platform-verifier-android"
+        val lines = parameters.lockFile.get().asFile.readLines()
+        val idx = lines.indexOfFirst { it.trim() == "name = \"$crate\"" }
+        val version = if (idx < 0) null else lines.drop(idx + 1)
+            .firstOrNull { it.trimStart().startsWith("version = ") }
+            ?.substringAfter('"', "")
+            ?.substringBefore('"', "")
+            ?.takeIf { it.isNotEmpty() }
+        return version ?: throw GradleException("$crate not found in Cargo.lock")
+    }
+}
+
+val rustlsPlatformVerifierVersion = providers.of(RustlsVersion::class) {
+    parameters.lockFile.set(layout.projectDirectory.file("../../Cargo.lock"))
+}
+
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "rustls" && requested.name == "rustls-platform-verifier") {
+            useVersion(rustlsPlatformVerifierVersion.get())
+            because("Kotlin component version must match the Rust crate")
+        }
+    }
+}
+
 android {
     namespace = "dev.hori.torrent"
     compileSdk = 35
@@ -78,4 +111,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    // Version resolved dynamically from Cargo.lock above.
+    implementation("rustls:rustls-platform-verifier")
 }

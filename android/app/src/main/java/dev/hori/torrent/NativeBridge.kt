@@ -9,7 +9,7 @@ object NativeBridge {
         System.loadLibrary("hori_core")
     }
 
-    @JvmStatic external fun nativeInit(outputDir: String, stateDir: String): Boolean
+    @JvmStatic external fun nativeInit(context: android.content.Context, outputDir: String, stateDir: String): Boolean
     @JvmStatic external fun nativeAdd(source: String, paused: Boolean): Long
     @JvmStatic external fun nativeAddBytes(bytes: ByteArray, paused: Boolean): Long
     @JvmStatic external fun nativeList(): String

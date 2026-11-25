@@ -33,7 +33,7 @@ class TorrentViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    NativeBridge.nativeInit(outputDir.absolutePath, stateDir.absolutePath)
+                    NativeBridge.nativeInit(app.applicationContext, outputDir.absolutePath, stateDir.absolutePath)
                 }
                 ready = true
                 TorrentService.start(app)

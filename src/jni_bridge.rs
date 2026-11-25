@@ -50,6 +50,7 @@ fn jstring_to_string(env: &mut JNIEnv, s: &JString) -> anyhow::Result<String> {
 pub extern "system" fn Java_dev_hori_torrent_NativeBridge_nativeInit(
     mut env: JNIEnv,
     _class: JClass,
+    context: JObject,
     output_dir: JString,
     state_dir: JString,
 ) -> jboolean {
@@ -59,10 +60,24 @@ pub extern "system" fn Java_dev_hori_torrent_NativeBridge_nativeInit(
         // Route Rust logs into logcat under tag "HoriCore".
         let _ = android_logger::init_once(
             android_logger::Config::default()
-                .with_max_level(log::LevelFilter::Info)
+                .with_max_level(log::LevelFilter::Debug)
                 .with_tag("HoriCore"),
         );
-        let _ = tracing_log::LogTracer::init();
+        // Forward tracing events (librqbit uses tracing) into log as well.
+        use tracing_subscriber::layer::SubscriberExt;
+        let _ = tracing::subscriber::set_global_default(
+            tracing_subscriber::registry()
+                .with(tracing_log::LogTracer::new())
+                .with(
+                    tracing_subscriber::EnvFilter::try_from_default_env()
+                        .unwrap_or_else(|_| "info,librqbit=debug,librqbit_dht=info".into()),
+                ),
+        );
+        // reqwest's rustls backend verifies certificates through the Android
+        // platform verifier; it must receive the JVM context before any
+        // HTTPS request is made.
+        rustls_platform_verifier::android::init_with_env(&mut env, context)
+            .map_err(|e| anyhow::anyhow!("TLS verifier init failed: {e}"))?;
         let engine = Engine::new(output, Some(state))?;
         let mut guard = engine_slot().lock().unwrap();
         *guard = Some(engine);

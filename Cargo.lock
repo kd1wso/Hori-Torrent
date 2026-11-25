@@ -911,6 +911,7 @@ dependencies = [
  "jni 0.21.1",
  "librqbit",
  "log",
+ "rustls-platform-verifier",
  "serde",
  "serde_json",
  "tokio",
